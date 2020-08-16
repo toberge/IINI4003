@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-tar czf temperatures.tar.gz -- *[^.][^g][^z]
+tar czf "${1:-submission}".tar.gz -- *[^g][^z]
