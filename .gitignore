@@ -1,0 +1,6 @@
+# Language server cache
+.ccls-cache
+
+# Build artifacts
+build
+*.tar.gz
