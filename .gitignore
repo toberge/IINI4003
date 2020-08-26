@@ -1,7 +1,11 @@
 # Language server cache
 .ccls-cache
 
+# Debug data (used for ccls)
+Debug
+
 # Build artifacts
 build
 *.tar.gz
+*.o
 a.out
