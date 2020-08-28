@@ -32,6 +32,8 @@ public:
     /// Returns true if the given chess piece move is valid
     virtual bool valid_move(int from_x, int from_y, int to_x, int to_y) const = 0;
 
+    virtual std::string to_string() const = 0;
+
     static bool within_bounds(int x, int y) {
       return x >= 0 && x < 8 && y >= 0 && y < 8;
     }
@@ -42,15 +44,17 @@ public:
     King(Color color) : Piece(color) {}
 
     std::string type() const override {
+      return (color == Color::WHITE ? "white" : "black") + std::string(" king");
+    }
+
+    std::string to_string() const override {
       // Yes, it could be done with text like this:
       // return (color == Color::WHITE ? "white" : "black") + " king";
       // But since there are unicode characters for all chess pieces
       // and the terminal *I* use does support unicode,
       // I choose to display the pieces in a prettier way
-      if (color == Color::WHITE)
-        return "♔";
-      else
-        return "♚";
+      // ...never mind, I'll conform to your desires
+      return (color == Color::WHITE) ? "♔" : "♚";
     }
 
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
@@ -67,11 +71,11 @@ public:
     Knight(Color color) : Piece(color) {}
 
     std::string type() const override {
-      // return (color == Color::WHITE ? "white" : "black") + " knight";
-      if (color == Color::WHITE)
-        return "♘";
-      else
-        return "♞";
+      return (color == Color::WHITE ? "white" : "black") + std::string(" knight");
+    }
+
+    std::string to_string() const override {
+      return (color == Color::WHITE) ? "♘" : "♞";
     }
 
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
@@ -83,6 +87,83 @@ public:
       /*     && (to_y == from_y - 2 || to_y == from_y + 2)); */
       return (abs(from_x - to_x) == 2 && abs(from_y - to_y) == 1)
           || (abs(from_x - to_x) == 1 && abs(from_y - to_y) == 2);
+    }
+  };
+
+  class Rook : public Piece {
+  public:
+    Rook(Color color) : Piece(color) {}
+
+    std::string type() const override {
+      return (color == Color::WHITE ? "white" : "black") + std::string(" rook");
+    }
+
+    std::string to_string() const override {
+      return (color == Color::WHITE) ? "♖" : "♜";
+    }
+
+    bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
+      if (!within_bounds(to_x, to_y))
+        return false;
+      return from_x == to_x || from_y == to_y; // movement along *one* axis
+    }
+  };
+
+  class Bishop : public Piece {
+  public:
+    Bishop(Color color) : Piece(color) {}
+
+    std::string type() const override {
+      return (color == Color::WHITE ? "white" : "black") + std::string(" bishop");
+    }
+
+    std::string to_string() const override {
+      return (color == Color::WHITE) ? "♗" : "♝";
+    }
+
+    bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
+      if (!within_bounds(to_x, to_y))
+        return false;
+      return abs( to_x - from_x ) == abs( from_y - to_y );
+    }
+  };
+
+  class Queen : public Piece {
+  public:
+    Queen(Color color) : Piece(color) {}
+
+    std::string type() const override {
+      return (color == Color::WHITE ? "white" : "black") + std::string(" queen");
+    }
+
+    std::string to_string() const override {
+      return (color == Color::WHITE) ? "♕" : "♛";
+    }
+
+    bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
+      if (!within_bounds(to_x, to_y))
+        return false;
+      return (from_x == to_x || from_y == to_y) || (abs( to_x - from_x ) == abs( from_y - to_y )); // eight-directional straight-line movement
+    }
+  };
+
+  class Pawn : public Piece {
+  public:
+    Pawn(Color color) : Piece(color) {}
+
+    std::string type() const override {
+      return (color == Color::WHITE ? "white" : "black") + std::string(" pawn");
+    }
+
+    std::string to_string() const override {
+      return (color == Color::WHITE) ? "♙" : "♟";
+    }
+
+    bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
+      if (!within_bounds(to_x, to_y))
+        return false;
+      return from_x == to_x && (abs(to_y - from_y) == 1
+          || (abs(to_y - from_y) == 2 && (color == Color::WHITE ? from_y == 1 : from_y == 6)));
     }
   };
 
@@ -135,9 +216,16 @@ public:
   std::string to_string() const {
     std::ostringstream os;
 
-    for (auto &column : squares) {
-      for (auto &piece : column)
-        os << (piece ? piece->type() : "_") << " ";
+    // Print column letters
+    os << " ";
+    for (int i = 0; i < 8; i++) 
+      os << " " << (char)('a' + i);
+    os << endl;
+
+    for (int i = 7; i >= 0; i--) {
+      os << (i+1); // so, the inner index is the y axis
+      for (int j = 0; j < 8; j++)
+        os << " " << (squares[j][i] ? squares[j][i]->to_string() : "_");
       os << endl;
     }
 
@@ -156,6 +244,15 @@ int main() {
   board.squares[1][7] = make_unique<ChessBoard::Knight>(ChessBoard::Color::BLACK);
   board.squares[6][7] = make_unique<ChessBoard::Knight>(ChessBoard::Color::BLACK);
 
+  ChessBoard other_board;
+
+  other_board.squares[4][2] = make_unique<ChessBoard::Queen>(ChessBoard::Color::WHITE);
+  other_board.squares[2][5] = make_unique<ChessBoard::Bishop>(ChessBoard::Color::WHITE);
+  other_board.squares[3][1] = make_unique<ChessBoard::Pawn>(ChessBoard::Color::WHITE);
+  other_board.squares[4][1] = make_unique<ChessBoard::Pawn>(ChessBoard::Color::WHITE);
+
+  other_board.squares[7][7] = make_unique<ChessBoard::Rook>(ChessBoard::Color::BLACK);
+
   cout << board.to_string();
 
   cout << "Invalid moves:" << endl;
@@ -164,25 +261,55 @@ int main() {
   board.move_piece("b1", "b2");
   cout << endl;
 
+  cout << "Another board:" << endl;
+  cout << other_board.to_string();
+  cout << endl;
+
+  cout << "More invalid moves:" << endl;
+  other_board.move_piece("e3", "f5"); // queen outside axis
+  other_board.move_piece("c6", "f5"); // bishop outside axis
+  other_board.move_piece("h8", "a1"); // rook outside axis
+  other_board.move_piece("e2", "e6"); // pawn 4 forward
+  cout << endl;
+
+  cout << "Some valid moves:" << endl;
+  other_board.move_piece("e3", "g5");
+  other_board.move_piece("c6", "a4");
+  other_board.move_piece("h8", "h1");
+  other_board.move_piece("d2", "d4");
+  other_board.move_piece("e2", "e3");
+  cout << endl;
+
+  cout << "State of this other board:" << endl;
+  cout << other_board.to_string();
+  cout << endl;
+
   cout << "A simulated game:" << endl;
-  board.move_piece("e1", "e2");
+
+  // the moves that were here before
+  vector<pair<string, string>> moves = {
+    {"e1", "e2"},
+    {"g8", "h6"},
+    {"b1", "c3"},
+    {"h6", "g8"},
+    {"c3", "d5"},
+    {"g8", "h6"},
+    {"d5", "f6"},
+    {"h6", "g8"},
+    {"f6", "e8"}
+  };
+
+  cout << endl;
   cout << board.to_string();
-  board.move_piece("g8", "h6");
-  cout << board.to_string();
-  board.move_piece("b1", "c3");
-  cout << board.to_string();
-  board.move_piece("h6", "g8");
-  cout << board.to_string();
-  board.move_piece("c3", "d5");
-  cout << board.to_string();
-  board.move_piece("g8", "h6");
-  cout << board.to_string();
-  board.move_piece("d5", "f6");
-  cout << board.to_string();
-  board.move_piece("h6", "g8");
-  cout << board.to_string();
-  board.move_piece("f6", "e8");
-  cout << board.to_string();
+  cout << endl;
+
+  // Decomposition time!
+  for (auto [a,b] : moves) {
+    board.move_piece(a, b);
+    cout << endl;
+    cout << board.to_string();
+    cout << endl;
+  }
 }
 
 // vim:softtabstop=2:shiftwidth=2
