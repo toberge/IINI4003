@@ -41,7 +41,7 @@ public:
   public:
     King(Color color) : Piece(color) {}
 
-    virtual std::string type() const {
+    std::string type() const override {
       // Yes, it could be done with text like this:
       // return (color == Color::WHITE ? "white" : "black") + " king";
       // But since there are unicode characters for all chess pieces
@@ -53,7 +53,7 @@ public:
         return "♚";
     }
 
-    virtual bool valid_move(int from_x, int from_y, int to_x, int to_y) const {
+    bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
       return to_x <= from_x + 1 && to_x >= from_y - 1
@@ -66,7 +66,7 @@ public:
   public:
     Knight(Color color) : Piece(color) {}
 
-    virtual std::string type() const {
+    std::string type() const override {
       // return (color == Color::WHITE ? "white" : "black") + " knight";
       if (color == Color::WHITE)
         return "♘";
@@ -74,7 +74,7 @@ public:
         return "♞";
     }
 
-    virtual bool valid_move(int from_x, int from_y, int to_x, int to_y) const {
+    bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
       /* return ((to_x == from_x - 2 || to_x == from_x + 2) */
