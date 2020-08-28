@@ -57,6 +57,8 @@ public:
       return (color == Color::WHITE) ? "♔" : "♚";
     }
 
+    /// A king moves 1 step in any direction
+    // This does not (and can not) handle castling
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
@@ -78,13 +80,10 @@ public:
       return (color == Color::WHITE) ? "♘" : "♞";
     }
 
+    /// A knight moves 2 steps in one direction and 1 step in the other
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
-      /* return ((to_x == from_x - 2 || to_x == from_x + 2) */
-      /*     && (to_y == from_y - 1 || to_y == from_y + 1)) */
-      /*     || ((to_x == from_x - 1 || to_x == from_x + 1) */
-      /*     && (to_y == from_y - 2 || to_y == from_y + 2)); */
       return (abs(from_x - to_x) == 2 && abs(from_y - to_y) == 1)
           || (abs(from_x - to_x) == 1 && abs(from_y - to_y) == 2);
     }
@@ -102,6 +101,7 @@ public:
       return (color == Color::WHITE) ? "♖" : "♜";
     }
 
+    /// A rook moves horizontally or vertically
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
@@ -121,6 +121,7 @@ public:
       return (color == Color::WHITE) ? "♗" : "♝";
     }
 
+    /// A bishop moves diagonally
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
@@ -140,6 +141,7 @@ public:
       return (color == Color::WHITE) ? "♕" : "♛";
     }
 
+    /// A queen moves like a rook and a bishop combined
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
@@ -159,6 +161,9 @@ public:
       return (color == Color::WHITE) ? "♙" : "♟";
     }
 
+    /// A pawn moves 1 step forward, or 2 if it is in its starting position
+    // This does *not* handle special/normal behaviour for taking out another piece,
+    // due to the severe limitation of not *knowing* the state of the board.
     bool valid_move(int from_x, int from_y, int to_x, int to_y) const override {
       if (!within_bounds(to_x, to_y))
         return false;
