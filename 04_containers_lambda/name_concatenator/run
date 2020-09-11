@@ -1,4 +1,5 @@
 #!/bin/sh
+set -eu
 bspc rule -a Name_concatenator state=floating
-pushd build; make; popd
+(cd build; make;)
 build/name_concatenator
