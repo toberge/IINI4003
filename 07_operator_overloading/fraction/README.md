@@ -1,4 +1,4 @@
-# b)
+# 1b)
 
 Skal forklare `5 - 3 - fraction1 - 7 - fraction2`
 
