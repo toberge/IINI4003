@@ -6,11 +6,11 @@ int main() {
     {
       int a = 2;
       std::unique_ptr<int> b;
-      *b = 2;
-      // this is wrong...
-      a_thread.reset(new std::thread([&a, &b] {
+      b = std::make_unique<int>(2);
+      // this was wrong...
+      a_thread = std::make_unique<std::thread>([&a, b = std::move(b)] {
         std::cout << (a + *b) << std::endl;
-      }));
+      });
     }
     // if this was a normal reference, it'd have been destroyed when going out of scope
     a_thread->join();

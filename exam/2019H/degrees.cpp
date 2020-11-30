@@ -9,6 +9,7 @@ using namespace std;
 
 class Degrees {
 public:
+    virtual ~Degrees() {}
     Degrees &operator+() const;
     Degrees &operator-() const;
     virtual const string description() const {
